@@ -14,10 +14,14 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from forms import CreatePostForm, CreateRegisterForm, CreateLoginForm, CreateCommentForm
 from functools import wraps
 from flask_gravatar import Gravatar
+import os
 
 # Create Flask Application
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+if os.environ.get("SECRET_KEY"):    # get environment variable
+    app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+else:   # get constant
+    app.config['SECRET_KEY'] = "8BYkEfBA6O6donzWlSihBXox7C0sKR6b"
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
@@ -33,7 +37,10 @@ gravatar = Gravatar(app,
                     base_url=None)
 
 # Connect Flask App to DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+if os.environ.get("DATABASE_URL"):  # Use PostGRES
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
+else:   # Use SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
