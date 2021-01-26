@@ -40,6 +40,7 @@ gravatar = Gravatar(app,
 if os.environ.get("DATABASE_URL"):  # Use PostGRES
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 else:   # Use SQLite
+    print("Using Local DB")
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -169,7 +170,6 @@ def login():
         user = db.session.query(User).filter_by(email=email).first()
         # If user exist, log in
         if user:
-            print(user.password)
             if check_password_hash(user.password, password):
                 login_user(user)
                 return redirect(url_for('get_all_posts'))
@@ -199,7 +199,6 @@ def show_post(post_id):
     comment_form = CreateCommentForm()
     if request.method == "POST":
         if current_user.is_authenticated:
-            print("Comment inserted: ", comment_form.comment_text.data)
             new_comment = Comment(author_id=current_user.id,
                                   post_id=requested_post.id,
                                   text=comment_form.comment_text.data)
